@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{ url_for('relatar') }}" class="btn btn-success mb-4">Novo Relato</a>
+<a href="{{ url_for('exportar') }}" class="btn btn-secondary mb-4">Exportar Relatos</a>
+{% for r in relatos %}
+<div class="card p-3">
+    <h4>{{ r.titulo }}</h4>
+    <p><strong>Executor:</strong> {{ r.executor }} | <strong>Data:</strong> {{ r.data }}</p>
+    <p>{{ r.descricao }}</p>
+    <p><strong>Área:</strong> {{ r.area }} | <strong>Subárea:</strong> {{ r.subarea }} | <strong>Equipamento:</strong> {{ r.equipamento }}</p>
+    <p><strong>Custo Total:</strong> R$ {{ "%.2f"|format(r.custo_total) }}</p>
+    <div class="row">
+        {% for f in r.fotos %}
+        <div class="col-md-3">
+            <img src="{{ url_for('static', filename='uploads/' + f.split('/')[-1]) }}" class="img-fluid rounded mb-2">
+        </div>
+        {% endfor %}
+    </div>
+    <div>
+        <strong>Peças:</strong>
+        <ul>
+        {% for p in r.pecas %}
+            <li>{{ p.catalog }} - {{ p.desc }} - {{ p.qtd }} un. (R$ {{ "%.2f"|format(p.custo) }})</li>
+        {% endfor %}
+        </ul>
+    </div>
+    <form action="{{ url_for('comentar', relato_id=loop.index0) }}" method="post" class="mt-2">
+        <input type="text" name="nome" placeholder="Seu nome" class="form-control mb-1" required>
+        <textarea name="mensagem" placeholder="Comentário" class="form-control mb-1" required></textarea>
+        <button type="submit" class="btn btn-light btn-sm">Comentar</button>
+    </form>
+    {% if comentarios[loop.index0] %}
+    <div class="mt-2">
+        <strong>Comentários:</strong>
+        <ul>
+        {% for c in comentarios[loop.index0] %}
+            <li><strong>{{ c.nome }}:</strong> {{ c.mensagem }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}
